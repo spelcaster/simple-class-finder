@@ -17,23 +17,24 @@ class Finder
         $this->loadClasses();
     }
 
-    public function loadClasses()
+    final protected function loadClasses()
     {
         foreach(get_declared_classes() as $class)
         {
             $namespacePieces = explode("\\", $class);
 
-            $this->updateNamespaceMap($namespacePieces, $class);
+            $hash = md5($class);
+            $this->updateNamespaceMap($namespacePieces, $class, $hash);
         }
 
         return $this;
     }
 
-    protected function updateNamespaceMap(array $namespacePieces, $classNamespace)
+    protected function updateNamespaceMap(array $namespacePieces, $classNamespace, $hash)
     {
         if (!$namespacePieces) {
             // register the class in the global namespace
-            $this->map[$this->defaultNamespace][] = $classNamespace;
+            $this->map[$this->defaultNamespace][$hash] = $classNamespace;
             return;
         }
 
@@ -42,11 +43,11 @@ class Finder
 
         $namespaceKey = implode('\\', $namespacePieces);
         if (!$namespaceKey) {
-            return $this->updateNamespaceMap($namespacePieces, $classNamespace);
+            return $this->updateNamespaceMap($namespacePieces, $classNamespace, $hash);
         }
 
-        $this->map[$namespaceKey][] = $classNamespace;
-        return $this->updateNamespaceMap($namespacePieces, $classNamespace);
+        $this->map[$namespaceKey][$hash] = $classNamespace;
+        return $this->updateNamespaceMap($namespacePieces, $classNamespace, $hash);
     }
 
     public function loadClassesFrom($path)
@@ -97,7 +98,7 @@ class Finder
             throw new InvalidArgumentException("The namespace '$namespace' was not found!");
         }
 
-        return $this->map[$namespace];
+        return array_values($this->map[$namespace]);
     }
 
     public function getClassesThatImplements($baseClass, $namespace = '')

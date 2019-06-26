@@ -11,10 +11,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "SimpleClassFinder\\": "src/SimpleClassFinder/"
+            "SimpleClassFinder\\": "src/"
         }
     },
     "require": {
         "php": "^7"
+    },
+    "require-dev": {
+        "psy/psysh": "^0.9.9"
     }
 }

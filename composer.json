@@ -1,0 +1,20 @@
+{
+    "name": "spelcaster/simple-class-finder",
+    "description": "A simple PHP class finder",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hugo do Carmo",
+            "email": "hugrito.kun@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SimpleClassFinder\\": "src/SimpleClassFinder/"
+        }
+    },
+    "require": {
+        "php": "^7"
+    }
+}

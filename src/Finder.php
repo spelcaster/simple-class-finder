@@ -7,6 +7,10 @@ use RuntimeException;
 use InvalidArgumentException;
 use ReflectionException;
 
+/**
+ * Class Finder
+ * @package SimpleClassFinder
+ */
 class Finder
 {
     protected $map = [];
@@ -17,6 +21,9 @@ class Finder
         $this->loadClasses();
     }
 
+    /**
+     * @return $this
+     */
     final protected function loadClasses()
     {
         foreach(get_declared_classes() as $class)
@@ -30,6 +37,11 @@ class Finder
         return $this;
     }
 
+    /**
+     * @param array $namespacePieces
+     * @param $classNamespace
+     * @param $hash
+     */
     protected function updateNamespaceMap(array $namespacePieces, $classNamespace, $hash)
     {
         if (!$namespacePieces) {
@@ -50,6 +62,11 @@ class Finder
         return $this->updateNamespaceMap($namespacePieces, $classNamespace, $hash);
     }
 
+    /**
+     * Load the classes from a given path
+     * @param $path
+     * @return Finder
+     */
     public function loadClassesFrom($path)
     {
         $autoloaderClass = "";
@@ -80,16 +97,29 @@ class Finder
         return $this->loadClasses();
     }
 
+    /**
+     * Return the namespaces traversed
+     * @return array
+     */
     public function getNamespaces()
     {
         return array_keys($this->map);
     }
 
+    /**
+     * Return all found classes
+     * @return array
+     */
     public function all()
     {
         return $this->map;
     }
 
+    /**
+     * Get all the classes inside the given namespace
+     * @param string $namespace
+     * @return array
+     */
     public function getClassesFromNamespace($namespace = '')
     {
         if (!$namespace) {
@@ -101,6 +131,13 @@ class Finder
         return array_values($this->map[$namespace]);
     }
 
+    /**
+     * Get all the classes that implements the given baseClass (it can be an abstract class, normal class or interface)
+     * @param $baseClass
+     * @param string $namespace
+     * @return array
+     * @throws ReflectionException
+     */
     public function getClassesThatImplements($baseClass, $namespace = '')
     {
         $baseClass = new ReflectionClass($baseClass);
@@ -112,6 +149,30 @@ class Finder
             if ($baseClass->isInterface() && $reflectionClass->implementsInterface($baseClass)) {
                 $classes[] = $class;
             } else if ($reflectionClass->isSubclassOf($baseClass)) {
+                $classes[] = $class;
+            }
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Get all the classes that implements a given trait
+     * @param $trait
+     * @param string $namespace
+     * @return array
+     * @throws ReflectionException
+     */
+    public function getClassesThatUses($trait, $namespace = '')
+    {
+        $traitClass = new ReflectionClass($trait); // yep, we don't use.
+        // But just to make sure that the trait exists, we will instantiate the Reflection of it
+        $classes = [];
+
+        foreach ($this->getClassesFromNamespace($namespace) as $class) {
+            $reflectionClass = new ReflectionClass($class);
+
+            if (in_array($trait, $reflectionClass->getTraits())) {
                 $classes[] = $class;
             }
         }

@@ -116,11 +116,11 @@ class Finder
     }
 
     /**
-     * Get all the classes inside the given namespace
+     * Get all the classes inside a given namespace
      * @param string $namespace
      * @return array
      */
-    public function getClassesFromNamespace($namespace = '')
+    public function getClassesIn($namespace = '')
     {
         if (!$namespace) {
             $namespace = $this->defaultNamespace;
@@ -143,7 +143,7 @@ class Finder
         $baseClass = new ReflectionClass($baseClass);
         $classes = [];
 
-        foreach ($this->getClassesFromNamespace($namespace) as $class) {
+        foreach ($this->getClassesIn($namespace) as $class) {
             $reflectionClass = new ReflectionClass($class);
 
             if ($baseClass->isInterface() && $reflectionClass->implementsInterface($baseClass)) {
@@ -169,7 +169,7 @@ class Finder
         // But just to make sure that the trait exists, we will instantiate the Reflection of it
         $classes = [];
 
-        foreach ($this->getClassesFromNamespace($namespace) as $class) {
+        foreach ($this->getClassesIn($namespace) as $class) {
             $traits = $this->getTraitsFromClass($class);
 
             if (in_array($trait, $traits)) {

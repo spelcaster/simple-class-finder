@@ -118,4 +118,21 @@ class Finder
 
         return $classes;
     }
+
+    public function getClassesThatUses($trait, $namespace = '')
+    {
+        $traitClass = new ReflectionClass($trait); // yep, we don't use.
+        // But just to make sure that the trait exists, we will instantiate the Reflection of it
+        $classes = [];
+
+        foreach ($this->getClassesFromNamespace($namespace) as $class) {
+            $reflectionClass = new ReflectionClass($class);
+
+            if (in_array($trait, $reflectionClass->getTraits())) {
+                $classes[] = $class;
+            }
+        }
+
+        return $classes;
+    }
 }

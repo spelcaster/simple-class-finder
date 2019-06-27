@@ -11,6 +11,8 @@ $finder->getClassesThatImplements("Symfony\Component\Console\Helper\Helper");
 // depends on `composer dumpautoload --optimize`
 $f->loadClassesFrom("src")
     ->getClassesFromNamespace("SimpleClassFinder");
+
+$f->getClassesThatUses("Awesome\Trait");
 ```
 
 # Similar Projects

@@ -170,13 +170,32 @@ class Finder
         $classes = [];
 
         foreach ($this->getClassesFromNamespace($namespace) as $class) {
-            $reflectionClass = new ReflectionClass($class);
+            $traits = $this->getTraitsFromClass($class);
 
-            if (in_array($trait, $reflectionClass->getTraits())) {
+            if (in_array($trait, $traits)) {
                 $classes[] = $class;
             }
         }
 
         return $classes;
+    }
+
+    /**
+     * Get traits from a class with the traits used from their parents
+     * @param string $class
+     * @param array  $traits
+     * @return array
+     */
+    protected function getTraitsFromClass($class, $traits = [])
+    {
+        if (!$class) {
+            return $traits;
+        } else if (!class_parents($class)) {
+            return array_merge($traits, class_uses($class));
+        }
+
+        $parents = class_parents($class);
+        $parent = array_pop($parents);
+        return $this->getTraitsFromClass($parent, class_uses($parent));
     }
 }

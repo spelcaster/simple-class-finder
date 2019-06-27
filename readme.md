@@ -4,13 +4,13 @@
 
 ```
 $finder = new SimpleClassFinder\Finder();
-$finder->getClassesFromNamespace("SimpleClassFinder");
+$finder->getClassesIn("SimpleClassFinder");
 
 $finder->getClassesThatImplements("Symfony\Component\Console\Helper\Helper");
 
 // depends on `composer dumpautoload --optimize`
 $f->loadClassesFrom("src")
-    ->getClassesFromNamespace("SimpleClassFinder");
+    ->getClassesIn("SimpleClassFinder");
 
 $f->getClassesThatUses("Awesome\Trait");
 ```

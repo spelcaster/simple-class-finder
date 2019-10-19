@@ -120,12 +120,16 @@ class Finder
      * @param string $namespace
      * @return array
      */
-    public function getClassesIn($namespace = '')
+    public function getClassesIn($namespace = '', $useHashMap = false)
     {
         if (!$namespace) {
             $namespace = $this->defaultNamespace;
         } else if(!isset($this->map[$namespace])) {
             throw new InvalidArgumentException("The namespace '$namespace' was not found!");
+        }
+
+        if ($useHashMap) {
+            return $this->map[$namespace];
         }
 
         return array_values($this->map[$namespace]);
@@ -138,22 +142,39 @@ class Finder
      * @return array
      * @throws ReflectionException
      */
-    public function getClassesThatImplements($baseClass, $namespace = '')
+    public function getClassesThatImplements($baseClass, $namespace = '', $useStringMatch = false)
     {
-        $baseClass = new ReflectionClass($baseClass);
+        $baseClassMap = [];
         $classes = [];
 
-        foreach ($this->getClassesIn($namespace) as $class) {
-            $reflectionClass = new ReflectionClass($class);
+        $baseClassMap[] = $baseClass;
+        if ($useStringMatch) {
+            $baseClassMap = [];
 
-            if ($baseClass->isInterface() && $reflectionClass->implementsInterface($baseClass)) {
-                $classes[] = $class;
-            } else if ($reflectionClass->isSubclassOf($baseClass)) {
-                $classes[] = $class;
+            foreach ($this->getClassesIn($namespace, true) as $hash => $class) {
+                if (strpos($class, $baseClass) == false) {
+                    continue;
+                }
+
+                $baseClassMap[$hash] = $class;
             }
         }
 
-        return $classes;
+        foreach ($baseClassMap as $baseClass) {
+            $base = new ReflectionClass($baseClass);
+
+            foreach ($this->getClassesIn($namespace, true) as $hash => $class) {
+                $reflectionClass = new ReflectionClass($class);
+
+                if ($base->isInterface() && $reflectionClass->implementsInterface($base)) {
+                    $classes[$hash] = $class;
+                } else if ($reflectionClass->isSubclassOf($base)) {
+                    $classes[$hash] = $class;
+                }
+            }
+        }
+
+        return array_values($classes);
     }
 
     /**

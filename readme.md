@@ -6,6 +6,8 @@
 $finder = new SimpleClassFinder\Finder();
 $finder->getClassesIn("SimpleClassFinder");
 
+$finder->getClassesThatImplements("Helper", "", true);
+$finder->getClassesThatImplements("Helper", "Symfony\Component\Console\Helper", true);
 $finder->getClassesThatImplements("Symfony\Component\Console\Helper\Helper");
 
 // depends on `composer dumpautoload --optimize`

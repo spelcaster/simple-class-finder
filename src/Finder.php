@@ -138,18 +138,35 @@ class Finder
      * @return array
      * @throws ReflectionException
      */
-    public function getClassesThatImplements($baseClass, $namespace = '')
+    public function getClassesThatImplements($baseClass, $namespace = '', $useStringMatch = false)
     {
-        $baseClass = new ReflectionClass($baseClass);
+        $baseClassMap = [];
         $classes = [];
 
-        foreach ($this->getClassesIn($namespace) as $class) {
-            $reflectionClass = new ReflectionClass($class);
+        $baseClassMap[] = $baseClass;
+        if ($useStringMatch) {
+            $baseClassMap = [];
 
-            if ($baseClass->isInterface() && $reflectionClass->implementsInterface($baseClass)) {
-                $classes[] = $class;
-            } else if ($reflectionClass->isSubclassOf($baseClass)) {
-                $classes[] = $class;
+            foreach ($this->getClassesIn($namespace) as $class) {
+                if (strpos($class, $baseClass) == false) {
+                    continue;
+                }
+
+                $baseClassMap[] = $class;
+            }
+        }
+
+        foreach ($baseClassMap as $baseClass) {
+            $base = new ReflectionClass($baseClass);
+
+            foreach ($this->getClassesIn($namespace) as $class) {
+                $reflectionClass = new ReflectionClass($class);
+
+                if ($base->isInterface() && $reflectionClass->implementsInterface($base)) {
+                    $classes[] = $class;
+                } else if ($reflectionClass->isSubclassOf($base)) {
+                    $classes[] = $class;
+                }
             }
         }
 
